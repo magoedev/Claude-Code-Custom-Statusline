@@ -29,7 +29,7 @@ Alle angezeigten Werte stammen aus den Session-Daten, die Claude Code selbst per
 ### 1. Repository klonen
 
 ```bash
-git clone https://github.com/magoedev/Claude-Code-Custom-Statusline.git ~/.claude/claude-statusline
+git clone https://github.com/magoedev/Claude-Code-Custom-Statusline.git ~/.claude/custom-statusline
 ```
 
 Unter Windows (PowerShell oder Git Bash) funktioniert derselbe Befehl, `~` steht dann für `C:/Users/<du>`.
