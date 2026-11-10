@@ -24,19 +24,36 @@ Alle angezeigten Werte stammen aus den Session-Daten, die Claude Code selbst per
 - Node.js (jede aktuelle LTS-Version)
 - Optional: `git` im `PATH` für das Branch-Segment
 
+Unter Windows lassen sich Node.js und Git bei Bedarf per `winget` installieren (danach ein neues Terminal öffnen):
+
+```powershell
+winget install OpenJS.NodeJS.LTS
+winget install Git.Git
+```
+
 ## Installation
 
+Die Schritte gibt es jeweils für macOS/Linux (bash/zsh) und für Windows (PowerShell).
+
 ### 1. Repository klonen
+
+**macOS / Linux:**
 
 ```bash
 git clone https://github.com/magoedev/Claude-Code-Custom-Statusline.git ~/.claude/custom-statusline
 ```
 
-Unter Windows (PowerShell oder Git Bash) funktioniert derselbe Befehl, `~` steht dann für `C:/Users/<du>`.
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/magoedev/Claude-Code-Custom-Statusline.git "$HOME\.claude\custom-statusline"
+```
+
+In PowerShell `$HOME` statt `~` verwenden. Windows PowerShell 5.1 gibt `~` nicht aufgelöst an `git` weiter, dann entsteht ein Ordner mit dem Namen `~`. In Git Bash funktioniert der macOS/Linux-Befehl unverändert.
 
 ### 2. In Claude Code eintragen
 
-In `~/.claude/settings.json` ergänzen:
+**macOS / Linux:** In `~/.claude/settings.json` ergänzen:
 
 ```json
 {
@@ -48,31 +65,83 @@ In `~/.claude/settings.json` ergänzen:
 }
 ```
 
-`refreshInterval` sorgt dafür, dass der Cache-Countdown auch dann weiterläuft, wenn gerade keine Antwort kommt. Unter Windows Pfade immer mit Vorwärts-Slashes (`/`) schreiben.
+**Windows:** Die Datei liegt unter `%USERPROFILE%\.claude\settings.json`, also z. B. `C:\Users\max\.claude\settings.json`. Öffnen lässt sie sich mit:
+
+```powershell
+notepad "$HOME\.claude\settings.json"
+```
+
+Dort den absoluten Pfad eintragen, mit Vorwärts-Slashes (`/`) statt Backslashes:
+
+```json
+{
+  "statusLine": {
+    "type": "command",
+    "command": "node C:/Users/max/.claude/custom-statusline/statusline.js",
+    "refreshInterval": 30
+  }
+}
+```
+
+`max` durch den eigenen Benutzernamen ersetzen. Den passenden Pfad gibt `"$HOME/.claude/custom-statusline/statusline.js" -replace '\\','/'` in PowerShell aus. Enthält der Pfad Leerzeichen, ihn in escapte Anführungszeichen setzen: `"node \"C:/Users/Max Muster/.claude/custom-statusline/statusline.js\""`.
+
+Existiert `settings.json` schon, nur den Block `"statusLine": { ... }` innerhalb der äußeren geschweiften Klammern ergänzen und auf das Komma zum vorherigen Eintrag achten.
+
+`refreshInterval` sorgt dafür, dass der Cache-Countdown auch dann weiterläuft, wenn gerade keine Antwort kommt.
 
 Claude Code lädt die Einstellungen automatisch neu. Die Statusline erscheint ab der nächsten Aktualisierung.
 
 ### 3. Testen (optional)
 
+**macOS / Linux:**
+
 ```bash
 node ~/.claude/custom-statusline/examples/demo.js
 ```
 
-Zeigt die Statusline mit Beispieldaten an, ohne Claude Code zu starten.
+**Windows (PowerShell):**
+
+```powershell
+node "$HOME\.claude\custom-statusline\examples\demo.js"
+```
+
+Zeigt die Statusline mit Beispieldaten an, ohne Claude Code zu starten. Unter Windows am besten [Windows Terminal](https://aka.ms/terminal) verwenden (in Windows 11 Standard). Die alte Konsole (`conhost`) stellt Farben und Sonderzeichen wie `█` oder `⎇` teils nicht korrekt dar.
 
 ## Konfiguration
 
 Ohne Config-Datei gelten sinnvolle Standardwerte. Zum Anpassen die Beispieldatei kopieren:
 
+**macOS / Linux:**
+
 ```bash
+cd ~/.claude/custom-statusline
 cp statusline.config.example.json statusline.config.json
+```
+
+**Windows (PowerShell):**
+
+```powershell
+cd "$HOME\.claude\custom-statusline"
+Copy-Item statusline.config.example.json statusline.config.json
 ```
 
 Die Config wird an diesen Orten gesucht, der erste Treffer gewinnt:
 
 1. Pfad aus der Umgebungsvariable `CLAUDE_STATUSLINE_CONFIG`
 2. `statusline.config.json` im selben Ordner wie `statusline.js`
-3. `~/.claude/statusline.config.json`
+3. `~/.claude/statusline.config.json` (Windows: `%USERPROFILE%\.claude\statusline.config.json`)
+
+Umgebungsvariable dauerhaft setzen:
+
+```bash
+# macOS / Linux: in ~/.bashrc bzw. ~/.zshrc
+export CLAUDE_STATUSLINE_CONFIG="$HOME/configs/statusline.json"
+```
+
+```powershell
+# Windows: gilt für alle neu gestarteten Terminals und Claude-Code-Sitzungen
+setx CLAUDE_STATUSLINE_CONFIG "$HOME\configs\statusline.json"
+```
 
 Die Datei muss nur die Werte enthalten, die du ändern willst. Alles andere wird mit den Standardwerten ergänzt. `statusline.config.json` steht in der `.gitignore`, damit persönliche Einstellungen nicht im Repository landen.
 
@@ -136,7 +205,9 @@ Segmente ohne Daten werden automatisch ausgeblendet. Ein unbekannter Segment-Nam
 ## Fehlerbehebung
 
 - **Statusline bleibt leer:** Skript manuell mit `node examples/demo.js` testen. Prüfen, ob der Ordner in Claude Code als vertrauenswürdig bestätigt wurde. `claude --debug` zeigt Fehler des Skripts.
-- **Windows: Befehl wird nicht gefunden:** Im `command` Vorwärts-Slashes verwenden, keine Backslashes.
+- **Windows: Befehl wird nicht gefunden:** Im `command` Vorwärts-Slashes verwenden, keine Backslashes, und den absoluten Pfad statt `~` eintragen.
+- **Windows: `node` bzw. `git` wird nicht erkannt:** Nach der Installation ein neues Terminal öffnen und Claude Code neu starten, damit der aktualisierte `PATH` greift. `node --version` und `git --version` prüfen.
+- **Windows: Ordner `~` im aktuellen Verzeichnis:** Das Repository wurde in PowerShell mit `~` statt `$HOME` geklont. Den Ordner löschen und den Windows-Befehl aus Schritt 1 verwenden.
 - **Cache-Countdown bleibt stehen:** `refreshInterval` in der `statusLine`-Einstellung setzen.
 - **Seltsame Zeichen statt Farben:** `"color": false` in der Config setzen.
 - **Branch fehlt:** `git` muss im `PATH` liegen, und der Ordner muss ein Git-Repository sein.
