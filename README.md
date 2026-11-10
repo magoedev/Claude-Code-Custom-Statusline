@@ -3,8 +3,8 @@
 Eine schlanke, konfigurierbare Statusline für [Claude Code](https://code.claude.com/docs/en/statusline) im Terminal. Sie zeigt unter anderem, wie lange der Prompt-Cache noch warm ist, wie voll das Context-Window ist und wie viel Budget verbraucht wurde.
 
 ```
-Sonnet 5.5 medium · webshop · ⎇ main · PR #1234 pending
-ctx ███░░░░░░░ 34% · cache ⏱ 53m 91% hit · budget $314/$500 monthly · ≈$1.23 · +156 -23
+Sonnet 5.5 medium │ webshop │ branch main │ PR #1234 pending
+ctx ███░░░░░░░ 34% │ cache 53m (91% hit) │ 5h 24% reset 2h09m │ 7d 41% reset 3d23h │ ≈$1.23 │ +156 -23
 ```
 
 ## Warum dieses Projekt
@@ -105,7 +105,7 @@ node ~/.claude/custom-statusline/examples/demo.js
 node "$HOME\.claude\custom-statusline\examples\demo.js"
 ```
 
-Zeigt die Statusline mit Beispieldaten an, ohne Claude Code zu starten. Unter Windows am besten [Windows Terminal](https://aka.ms/terminal) verwenden (in Windows 11 Standard). Die alte Konsole (`conhost`) stellt Farben und Sonderzeichen wie `█` oder `⎇` teils nicht korrekt dar.
+Zeigt die Statusline mit Beispieldaten an, ohne Claude Code zu starten. Unter Windows am besten [Windows Terminal](https://aka.ms/terminal) verwenden (in Windows 11 Standard). Die alte Konsole (`conhost`) stellt Farben und Sonderzeichen wie `█` oder `│` teils nicht korrekt dar.
 
 ## Konfiguration
 
@@ -152,7 +152,7 @@ Die Datei muss nur die Werte enthalten, die du ändern willst. Alles andere wird
 | Option | Standard | Beschreibung |
 |---|---|---|
 | `lines` | siehe unten | Liste von Zeilen, jede Zeile eine Liste von Segment-Namen. Reihenfolge = Anzeigereihenfolge. |
-| `separator` | `" · "` | Trennzeichen zwischen Segmenten |
+| `separator` | `" │ "` | Trennzeichen zwischen Segmenten. Bei Darstellungsproblemen z. B. `" \| "` verwenden. |
 | `color` | `true` | Farben an/aus. Die Umgebungsvariable `NO_COLOR` schaltet sie ebenfalls ab. |
 | `colors.text` | `"brightWhite"` | Schriftfarbe für normalen Text |
 | `colors.background` | `"black"` | Hintergrundfarbe der Statusline. `null` = Terminal-Hintergrund |

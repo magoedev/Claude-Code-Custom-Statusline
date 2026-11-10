@@ -21,7 +21,7 @@ const DEFAULTS = {
     ['model', 'project', 'branch', 'pr'],
     ['context', 'cache', 'limits', 'budget', 'cost', 'lines'],
   ],
-  separator: ' · ',
+  separator: ' │ ',
   color: true,
   colors: {
     text: 'brightWhite',
@@ -122,6 +122,7 @@ const yellow = paint(COLORS.warn);
 const red = paint(COLORS.crit);
 const cyan = paint(COLORS.accent);
 const plain = (s) => String(s);
+const SEP = dim(CFG.separator ?? DEFAULTS.separator);
 const line = (s) => (useColor && BASE ? `\x1b[0;${BASE}m${s}\x1b[0m` : s);
 
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
@@ -178,7 +179,7 @@ const SEGMENTS = {
   },
 
   branch(d) {
-    if (d.worktree?.branch) return dim('⎇ ') + d.worktree.branch;
+    if (d.worktree?.branch) return dim('branch ') + d.worktree.branch;
     const dir = workDir(d);
     if (!dir) return '';
     try {
@@ -189,7 +190,7 @@ const SEGMENTS = {
         stdio: ['ignore', 'pipe', 'ignore'],
         windowsHide: true,
       }).trim();
-      return name ? dim('⎇ ') + name : '';
+      return name ? dim('branch ') + name : '';
     } catch {
       return '';
     }
@@ -217,7 +218,7 @@ const SEGMENTS = {
     if (!pc.caching_observed) return dim('cache aus');
 
     const hit = opts.showHitRatio !== false && isNum(pc.hit_ratio)
-      ? ' ' + dim(`${Math.round(pc.hit_ratio * 100)}% hit`)
+      ? ' ' + dim(`(${Math.round(pc.hit_ratio * 100)}% hit)`)
       : '';
     const left = isNum(pc.expires_at) ? pc.expires_at - nowSec() : -1;
 
@@ -225,7 +226,7 @@ const SEGMENTS = {
       const ttl = pc.ttl === '1h' ? 3600 : 300;
       const frac = left / ttl;
       const color = frac < 0.1 ? red : frac < 0.3 ? yellow : green;
-      return `cache ${color('⏱ ' + duration(left))}${hit}`;
+      return `cache ${color(duration(left))}${hit}`;
     }
     const recache = opts.showRecacheTokens !== false && isNum(pc.recache_tokens_if_cold)
       ? ' ' + dim(`(${tokens(pc.recache_tokens_if_cold)} neu)`)
@@ -240,14 +241,14 @@ const SEGMENTS = {
     const windowText = (label, w) => {
       if (!w || !isNum(w.used_percentage)) return '';
       const reset = opts.showResetIn !== false && isNum(w.resets_at)
-        ? ' ' + dim('↻' + duration(w.resets_at - nowSec()))
+        ? ' ' + dim('reset ' + duration(w.resets_at - nowSec()))
         : '';
       return `${label} ${byUsage(w.used_percentage)(Math.round(w.used_percentage) + '%')}${reset}`;
     };
     return [
       opts.showFiveHour !== false ? windowText('5h', rl.five_hour) : '',
       opts.showSevenDay !== false ? windowText('7d', rl.seven_day) : '',
-    ].filter(Boolean).join(' ');
+    ].filter(Boolean).join(SEP);
   },
 
   budget(d) {
@@ -276,7 +277,7 @@ const SEGMENTS = {
 
   duration(d) {
     const ms = d.cost?.total_duration_ms;
-    return isNum(ms) ? dim('⏲ ') + duration(ms / 1000) : '';
+    return isNum(ms) ? dim('time ') + duration(ms / 1000) : '';
   },
 
   session(d) {
@@ -294,7 +295,6 @@ const SEGMENTS = {
 
 // ------------------------------------------------------------------ Ausgabe
 function render(d) {
-  const sep = dim(CFG.separator ?? ' · ');
   const lines = Array.isArray(CFG.lines) ? CFG.lines : DEFAULTS.lines;
   const out = lines
     .map((names) =>
@@ -309,7 +309,7 @@ function render(d) {
           }
         })
         .filter(Boolean)
-        .join(sep),
+        .join(SEP),
     )
     .filter(Boolean);
   if (CONFIG_ERROR) out.push(red(CONFIG_ERROR));

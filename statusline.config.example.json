@@ -3,7 +3,7 @@
     ["model", "project", "branch", "pr"],
     ["context", "cache", "limits", "budget", "cost", "lines"]
   ],
-  "separator": " · ",
+  "separator": " │ ",
   "color": true,
   "colors": {
     "text": "brightWhite",
