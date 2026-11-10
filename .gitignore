@@ -1,0 +1,4 @@
+# Persönliche Config nicht einchecken
+statusline.config.json
+node_modules/
+.DS_Store

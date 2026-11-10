@@ -1,0 +1,17 @@
+{
+  "lines": [
+    ["model", "project", "branch", "pr"],
+    ["context", "cache", "limits", "budget", "cost", "lines"]
+  ],
+  "separator": " · ",
+  "color": true,
+  "barWidth": 10,
+  "thresholds": { "warn": 70, "crit": 90 },
+  "segments": {
+    "model": { "showEffort": true },
+    "cache": { "showHitRatio": true, "showRecacheTokens": true },
+    "limits": { "showFiveHour": true, "showSevenDay": true, "showResetIn": true },
+    "budget": { "showPeriod": true },
+    "cost": { "decimals": 2 }
+  }
+}
