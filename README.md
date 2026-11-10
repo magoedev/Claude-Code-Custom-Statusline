@@ -42,7 +42,7 @@ In `~/.claude/settings.json` ergänzen:
 {
   "statusLine": {
     "type": "command",
-    "command": "node ~/.claude/claude-statusline/statusline.js",
+    "command": "node ~/.claude/custom-statusline/statusline.js",
     "refreshInterval": 30
   }
 }
@@ -55,7 +55,7 @@ Claude Code lädt die Einstellungen automatisch neu. Die Statusline erscheint ab
 ### 3. Testen (optional)
 
 ```bash
-node ~/.claude/claude-statusline/examples/demo.js
+node ~/.claude/custom-statusline/examples/demo.js
 ```
 
 Zeigt die Statusline mit Beispieldaten an, ohne Claude Code zu starten.
