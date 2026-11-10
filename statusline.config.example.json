@@ -5,6 +5,15 @@
   ],
   "separator": " · ",
   "color": true,
+  "colors": {
+    "text": "brightWhite",
+    "muted": "white",
+    "background": "black",
+    "accent": "brightCyan",
+    "ok": "brightGreen",
+    "warn": "brightYellow",
+    "crit": "brightRed"
+  },
   "barWidth": 10,
   "thresholds": { "warn": 70, "crit": 90 },
   "segments": {

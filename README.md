@@ -154,10 +154,32 @@ Die Datei muss nur die Werte enthalten, die du ändern willst. Alles andere wird
 | `lines` | siehe unten | Liste von Zeilen, jede Zeile eine Liste von Segment-Namen. Reihenfolge = Anzeigereihenfolge. |
 | `separator` | `" · "` | Trennzeichen zwischen Segmenten |
 | `color` | `true` | Farben an/aus. Die Umgebungsvariable `NO_COLOR` schaltet sie ebenfalls ab. |
+| `colors.text` | `"brightWhite"` | Schriftfarbe für normalen Text |
+| `colors.background` | `"black"` | Hintergrundfarbe der Statusline. `null` = Terminal-Hintergrund |
+| `colors.muted` | `"white"` | Nebeninfos wie Effort, Hit-Ratio, Reset-Zeiten, Trennzeichen |
+| `colors.accent` | `"brightCyan"` | Modellname |
+| `colors.ok` / `warn` / `crit` | `"brightGreen"` / `"brightYellow"` / `"brightRed"` | Statusfarben je nach Auslastung |
 | `barWidth` | `10` | Breite des Context-Balkens in Zeichen |
 | `thresholds.warn` | `70` | Ab diesem Prozentwert gelb (Context, Limits, Budget) |
 | `thresholds.crit` | `90` | Ab diesem Prozentwert rot |
 | `segments.<name>` | | Feineinstellungen pro Segment, siehe Tabelle |
+
+### Farben
+
+Standard ist weiße Schrift auf schwarzem Hintergrund. Jede Farbe unter `colors` akzeptiert:
+
+- einen Namen: `black`, `red`, `green`, `yellow`, `blue`, `magenta`, `cyan`, `white`, `gray` und jeweils die `bright`-Variante, z. B. `brightWhite`
+- einen Hex-Wert, z. B. `"#e0e0e0"` (Truecolor, z. B. in Windows Terminal)
+- eine Zahl von `0` bis `255` aus der 256-Farben-Palette
+- `null` oder `"default"` für die Standardfarbe des Terminals
+
+Beispiel für helle Terminals, ohne eigenen Hintergrund:
+
+```json
+{ "colors": { "text": "black", "muted": "gray", "background": null } }
+```
+
+### Layout
 
 Standard-Layout:
 

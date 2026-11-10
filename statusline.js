@@ -23,6 +23,15 @@ const DEFAULTS = {
   ],
   separator: ' · ',
   color: true,
+  colors: {
+    text: 'brightWhite',
+    muted: 'white',
+    background: 'black',
+    accent: 'brightCyan',
+    ok: 'brightGreen',
+    warn: 'brightYellow',
+    crit: 'brightRed',
+  },
   barWidth: 10,
   thresholds: { warn: 70, crit: 90 },
   segments: {
@@ -75,13 +84,45 @@ const { config: CFG, error: CONFIG_ERROR } = loadConfig();
 
 // ------------------------------------------------------------------ Darstellung
 const useColor = CFG.color !== false && !process.env.NO_COLOR;
-const paint = (code) => (s) => (useColor ? `\x1b[${code}m${s}\x1b[0m` : String(s));
-const dim = paint('2');
-const green = paint('32');
-const yellow = paint('33');
-const red = paint('31');
-const cyan = paint('36');
+
+const COLOR_NAMES = [
+  'black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white',
+];
+
+// Farbe als Name ("white", "brightRed", "gray"), Hex ("#d0d0d0") oder 256er-Index (0-255).
+// Leer, null oder "default" = Terminal-Standard.
+function colorCode(value, background) {
+  if (value === null || value === undefined || value === '' || value === 'default') return '';
+  const base = background ? 40 : 30;
+  if (typeof value === 'number' && value >= 0 && value <= 255) return `${base + 8};5;${value | 0}`;
+  const text = String(value).trim();
+  const hex = /^#?([0-9a-f]{6})$/i.exec(text);
+  if (hex) {
+    const n = parseInt(hex[1], 16);
+    return `${base + 8};2;${(n >> 16) & 255};${(n >> 8) & 255};${n & 255}`;
+  }
+  const name = text.toLowerCase().replace(/[\s_-]/g, '');
+  if (name === 'gray' || name === 'grey') return String(base + 60);
+  const bright = name.startsWith('bright');
+  const index = COLOR_NAMES.indexOf(bright ? name.slice(6) : name);
+  return index < 0 ? '' : String(base + index + (bright ? 60 : 0));
+}
+
+const COLORS = { ...DEFAULTS.colors, ...(CFG.colors || {}) };
+// Grundfarbe (Text + Hintergrund), wird nach jedem farbigen Abschnitt wiederhergestellt
+const BASE = [colorCode(COLORS.text), colorCode(COLORS.background, true)].filter(Boolean).join(';');
+const restore = BASE ? `\x1b[0;${BASE}m` : '\x1b[0m';
+const paint = (color) => {
+  const code = colorCode(color);
+  return (s) => (useColor && code ? `\x1b[${code}m${s}${restore}` : String(s));
+};
+const dim = paint(COLORS.muted);
+const green = paint(COLORS.ok);
+const yellow = paint(COLORS.warn);
+const red = paint(COLORS.crit);
+const cyan = paint(COLORS.accent);
 const plain = (s) => String(s);
+const line = (s) => (useColor && BASE ? `\x1b[0;${BASE}m${s}\x1b[0m` : s);
 
 const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
 const nowSec = () => Date.now() / 1000;
@@ -272,7 +313,7 @@ function render(d) {
     )
     .filter(Boolean);
   if (CONFIG_ERROR) out.push(red(CONFIG_ERROR));
-  return out.join('\n');
+  return out.map(line).join('\n');
 }
 
 let input = '';
